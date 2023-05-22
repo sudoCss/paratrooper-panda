@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Paratrooper Panda</title>
+    </head>
+    <body>
+        <canvas id="scene"></canvas>
+        <div class="loading">
+            <div class="spinner-container">
+                <span class="spinner"></span>
+                <p>Loading<span>.</span><span>.</span><span>.</span></p>
+                <progress id="progress-bar" value="0" max="100"></progress>
+            </div>
+            <form class="initials hidden">
+                <label for="ship-height"
+                    >Ship Height (Meters)
+                    <input
+                        type="number"
+                        min="10"
+                        max="10000"
+                        name="shipHeight"
+                        placeholder="ship height in meters"
+                        id="ship-height"
+                        value="1000"
+                    />
+                </label>
+                <label for="ship-speed"
+                    >Ship Speed (Meters/Second)
+                    <input
+                        type="number"
+                        min="0"
+                        max="330"
+                        name="shipSpeed"
+                        placeholder="ship speed in m/s"
+                        id="ship-speed"
+                        value="100"
+                    />
+                </label>
+                <input type="submit" value="Start" />
+            </form>
+        </div>
+        <script type="module" src="/src/main.js"></script>
+    </body>
+</html>
