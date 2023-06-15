@@ -22,6 +22,8 @@ import {
     startLoading,
 } from "./loading";
 
+import { ENVIRONMENT } from "./physics/index";
+
 /* DOM access */
 const canvas = document.getElementById("scene");
 
@@ -31,7 +33,7 @@ const camera = new PerspectiveCamera(
     75,
     canvas.width / canvas.height,
     0.1,
-    100000,
+    100_000,
 );
 const renderer = new WebGLRenderer({
     canvas,
@@ -40,10 +42,6 @@ const renderer = new WebGLRenderer({
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFSoftShadowMap;
 const shipGroup = new Group();
-const SETTINGS = {
-    shipSpeed: 100,
-    shipHeight: 1000,
-};
 
 /* Functions */
 const handleWindowResize = () => {
@@ -67,7 +65,7 @@ const init = () => {
     shipGroup.add(panda);
     shipGroup.add(ship);
 
-    shipGroup.position.y = SETTINGS.shipHeight;
+    shipGroup.position.y = ENVIRONMENT.H;
 
     scene.add(shipGroup);
     // scene.add(cloud);
@@ -128,10 +126,11 @@ export const main = () => {
                 e.preventDefault();
                 /** Get Inputs and change variables if needed */
                 const data = new FormData(e.target);
-                for (const i of data.entries()) {
-                    SETTINGS[i[0]] = i[1] ? +i[1] : SETTINGS[i[0]];
-                }
-                console.log(SETTINGS);
+                const fields = Object.fromEntries(data.entries());
+                console.log(fields);
+                ENVIRONMENT.V0x = +fields.shipSpeed;
+                ENVIRONMENT.H = +fields.shipHeight;
+                
                 /** Get Inputs */
                 document.querySelector(".loading").remove();
 
