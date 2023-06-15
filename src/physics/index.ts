@@ -73,7 +73,7 @@ function acceleration(ha: number, va: number): number {
 }
 
 // Main physics
-export default function physics(t: number) {
+export function physics(t: number) {
     const hv = horizontalVelocity(t);
     const vv = verticalVelocity(t);
     const v = velocity(hv, vv);

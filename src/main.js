@@ -2,6 +2,7 @@ import "./style.css";
 
 import {
     AmbientLight,
+    Clock,
     DirectionalLight,
     Group,
     LinearSRGBColorSpace,
@@ -22,7 +23,7 @@ import {
     startLoading,
 } from "./loading";
 
-import { ENVIRONMENT } from "./physics/index";
+import { ENVIRONMENT, physics } from "./physics/index";
 
 /* DOM access */
 const canvas = document.getElementById("scene");
@@ -42,6 +43,9 @@ const renderer = new WebGLRenderer({
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFSoftShadowMap;
 const shipGroup = new Group();
+const clock = new Clock(false);
+const pandaJumpPos = { x: 0, y: 0 };
+let jumped = false;
 
 /* Functions */
 const handleWindowResize = () => {
@@ -81,16 +85,30 @@ const init = () => {
 
     camera.position.set(0, 1, 5);
     window.addEventListener("keypress", (e) => {
-        if (e.key === "v") {
+        if (e.code === "KeyV") {
             camera.position.z = camera.position.z === 5 ? 100 : 5;
+        }
+        if (e.code === "Space") {
+            jumped = true;
+            pandaJumpPos.x = panda.position.x;
+            pandaJumpPos.y = panda.position.y;
         }
     });
 
     renderer.outputColorSpace = LinearSRGBColorSpace;
 };
 
-const update = (delta) => {
+const update = (delta, elapsedTime) => {
     pandaAnimationMixer.update(delta / 1000);
+    if (jumped) {
+        const { v, a, tv, pos } = physics(elapsedTime);
+        console.log({ v, a, tv, pos });
+
+        if (panda.position.y > 0) {
+            panda.position.setX(pandaJumpPos.x + pos.x);
+            panda.position.setY(pandaJumpPos.y - pos.y);
+        }
+    }
 };
 
 const render = () => {
@@ -101,15 +119,12 @@ export const main = () => {
     window.addEventListener("resize", handleWindowResize);
     window.addEventListener("load", handleWindowResize);
 
-    let lastTime = Date.now();
+    clock.start();
 
     const loop = () => {
         window.requestAnimationFrame(loop);
-        const currentTime = Date.now();
-        const delta = currentTime - lastTime;
-        lastTime = currentTime;
 
-        update(delta);
+        update(clock.getDelta(), clock.elapsedTime);
         render();
     };
 
@@ -130,7 +145,7 @@ export const main = () => {
                 console.log(fields);
                 ENVIRONMENT.V0x = +fields.shipSpeed;
                 ENVIRONMENT.H = +fields.shipHeight;
-                
+
                 /** Get Inputs */
                 document.querySelector(".loading").remove();
 
