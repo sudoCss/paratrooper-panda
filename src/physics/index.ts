@@ -16,7 +16,7 @@ function K() {
 // Terminal
 function terminalVelocity(): number {
     const v = Math.sqrt((ENVIRONMENT.M * ENVIRONMENT.G) / K());
-    return Math.sqrt(v ** v + v ** v);
+    return Math.sqrt(v ** 2 + v ** 2);
 }
 
 // Vertical
@@ -28,7 +28,7 @@ function verticalVelocity(t: number): number {
 }
 
 function verticalAcceleration(v: number): number {
-    return ENVIRONMENT.G - (K() / ENVIRONMENT.M) * v ** v;
+    return ENVIRONMENT.G - (K() / ENVIRONMENT.M) * v ** 2;
 }
 
 function Y(t: number): number {
@@ -49,7 +49,7 @@ function horizontalVelocity(t: number): number {
 }
 
 function horizontalAcceleration(v: number): number {
-    return -((K() / ENVIRONMENT.M) * v ** v);
+    return -((K() / ENVIRONMENT.M) * v ** 2);
 }
 
 function X(t: number): number {

@@ -44,6 +44,7 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = PCFSoftShadowMap;
 const shipGroup = new Group();
 const clock = new Clock(false);
+const jumpClock = new Clock(false);
 const pandaJumpPos = { x: 0, y: 0 };
 let jumped = false;
 
@@ -60,6 +61,8 @@ const handleWindowResize = () => {
 };
 
 const init = () => {
+    clock.start();
+
     scene.background = skybox;
 
     panda.position.set(-3, 12.8, -8);
@@ -90,8 +93,17 @@ const init = () => {
         }
         if (e.code === "Space") {
             jumped = true;
+            jumpClock.start();
+
+            shipGroup.remove(panda);
+            panda.position.set(
+                shipGroup.position.x,
+                shipGroup.position.y,
+                shipGroup.position.z,
+            );
             pandaJumpPos.x = panda.position.x;
             pandaJumpPos.y = panda.position.y;
+            scene.add(panda);
         }
     });
 
@@ -99,15 +111,15 @@ const init = () => {
 };
 
 const update = (delta, elapsedTime) => {
-    pandaAnimationMixer.update(delta / 1000);
+    pandaAnimationMixer.update(delta);
     if (jumped) {
         const { v, a, tv, pos } = physics(elapsedTime);
-        console.log({ v, a, tv, pos });
 
         if (panda.position.y > 0) {
-            panda.position.setX(pandaJumpPos.x + pos.x);
+            panda.position.setX(pandaJumpPos.x - pos.x);
             panda.position.setY(pandaJumpPos.y - pos.y);
         }
+        console.log(elapsedTime, panda.position, v, a, tv);
     }
 };
 
@@ -118,8 +130,6 @@ const render = () => {
 export const main = () => {
     window.addEventListener("resize", handleWindowResize);
     window.addEventListener("load", handleWindowResize);
-
-    clock.start();
 
     const loop = () => {
         window.requestAnimationFrame(loop);
