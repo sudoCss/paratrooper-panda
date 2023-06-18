@@ -23,7 +23,7 @@ import {
     startLoading,
 } from "./loading";
 
-import { ENVIRONMENT, physics } from "./physics/index";
+import { ENVIRONMENT, physics, setup } from "./physics/alternative";
 
 /* DOM access */
 const canvas = document.getElementById("scene");
@@ -107,12 +107,9 @@ const init = () => {
                 pandaJumpPos.y = panda.position.y;
                 scene.add(panda);
             } else if (!opened) {
+                // FIX===
                 opened = true;
 
-                pandaJumpPos.x = panda.position.x;
-                pandaJumpPos.y = panda.position.y;
-
-                jumpClock.start();
                 ENVIRONMENT.A = 5;
             }
         }
@@ -121,16 +118,16 @@ const init = () => {
     renderer.outputColorSpace = LinearSRGBColorSpace;
 };
 
-const update = (delta, elapsedTime) => {
+const update = (delta, _elapsedTime) => {
     pandaAnimationMixer.update(delta);
     if (jumped) {
-        const { v, a, tv, pos } = physics(elapsedTime);
+        const { v, a, tv, pos } = physics(delta);
 
         if (panda.position.y > 0) {
-            panda.position.setX(pandaJumpPos.x - pos.x);
-            panda.position.setY(pandaJumpPos.y - pos.y);
+            panda.position.setX(panda.position.x + pos.x);
+            panda.position.setY(panda.position.y - pos.y);
         }
-        console.log(elapsedTime, panda.position, v, a, tv);
+        console.log({ v, a, tv }, "\n", panda.position);
     }
 };
 
@@ -166,6 +163,7 @@ export const main = () => {
                 console.log(fields);
                 ENVIRONMENT.V0x = +fields.shipSpeed;
                 ENVIRONMENT.H = +fields.shipHeight;
+                setup();
 
                 /** Get Inputs */
                 document.querySelector(".loading").remove();

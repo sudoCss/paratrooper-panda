@@ -53,16 +53,15 @@ function horizontalAcceleration(v: number): number {
 }
 
 function X(t: number): number {
-    return Math.sqrt(
-        Math.pow(
-            // (ENVIRONMENT.M / K()) *
-                (Math.log(K() * ENVIRONMENT.V0x * t - ENVIRONMENT.M) -
-                    Math.log(ENVIRONMENT.M)),
-            2,
-        ) + Math.pow(1.36437635
-            // * (ENVIRONMENT.M / K())
-            , 2),
-    ) * (ENVIRONMENT.M / K());
+    // return Math.sqrt(
+    //     Math.pow(
+    //         (ENVIRONMENT.M / K()) *
+    //             (Math.log(K() * ENVIRONMENT.V0x * t - ENVIRONMENT.M) -
+    //                 Math.log(ENVIRONMENT.M)),
+    //         2,
+    //     ) + Math.pow(1.36437635 * (ENVIRONMENT.M / K()), 2),
+    // );
+    return ENVIRONMENT.V0x * t - (K() * t ** 2) / ENVIRONMENT.M;
 }
 
 // Combining
