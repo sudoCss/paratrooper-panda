@@ -47,6 +47,7 @@ const clock = new Clock(false);
 const jumpClock = new Clock(false);
 const pandaJumpPos = { x: 0, y: 0 };
 let jumped = false;
+let opened = false;
 
 /* Functions */
 const handleWindowResize = () => {
@@ -66,7 +67,7 @@ const init = () => {
     scene.background = skybox;
 
     panda.position.set(-3, 12.8, -8);
-    panda.rotation.set(0, -Math.PI / 2, 0);
+    // panda.rotation.set(0, -Math.PI / 2, 0);
     panda.add(camera);
 
     shipGroup.add(panda);
@@ -89,21 +90,31 @@ const init = () => {
     camera.position.set(0, 1, 5);
     window.addEventListener("keypress", (e) => {
         if (e.code === "KeyV") {
-            camera.position.z = camera.position.z === 5 ? 100 : 5;
+            camera.position.z = camera.position.z === 5 ? 300 : 5;
         }
         if (e.code === "Space") {
-            jumped = true;
-            jumpClock.start();
+            if (!jumped) {
+                jumped = true;
+                jumpClock.start();
 
-            shipGroup.remove(panda);
-            panda.position.set(
-                shipGroup.position.x,
-                shipGroup.position.y,
-                shipGroup.position.z,
-            );
-            pandaJumpPos.x = panda.position.x;
-            pandaJumpPos.y = panda.position.y;
-            scene.add(panda);
+                shipGroup.remove(panda);
+                panda.position.set(
+                    shipGroup.position.x,
+                    shipGroup.position.y,
+                    shipGroup.position.z,
+                );
+                pandaJumpPos.x = panda.position.x;
+                pandaJumpPos.y = panda.position.y;
+                scene.add(panda);
+            } else if (!opened) {
+                opened = true;
+
+                pandaJumpPos.x = panda.position.x;
+                pandaJumpPos.y = panda.position.y;
+
+                jumpClock.start();
+                ENVIRONMENT.A = 5;
+            }
         }
     });
 

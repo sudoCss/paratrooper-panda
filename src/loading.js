@@ -32,7 +32,6 @@ export function startLoading(loadingManager) {
             panda = gltf.scene;
 
             pandaAnimationMixer = new AnimationMixer(gltf.scene);
-            console.log(gltf.animations.map((i) => i.name));
             const action1 = pandaAnimationMixer
                 .clipAction(gltf.animations[9])
                 .play();
