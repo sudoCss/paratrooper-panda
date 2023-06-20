@@ -15,7 +15,7 @@ let vy: number;
 let ax: number;
 let ay: number;
 
-export function setup() {
+export function setup(): void {
     vx = ENVIRONMENT.V0x;
     vy = ENVIRONMENT.V0y;
     ax = 0;
@@ -23,52 +23,62 @@ export function setup() {
 }
 
 // K
-function K() {
+function K(): number {
     return (1 / 2) * ENVIRONMENT.Cd * ENVIRONMENT.Ro * ENVIRONMENT.A;
 }
 
 // Vertical
-function verticalAcceleration() {
+function verticalAcceleration(): number {
     return ENVIRONMENT.G - (K() / ENVIRONMENT.M) * vy * Math.abs(vy);
 }
 
-function verticalVelocity(dt: number) {
+function verticalVelocity(dt: number): number {
     return vy + ay * dt;
 }
 
-function Y(dt: number) {
+function Y(dt: number): number {
     return vy * dt + (1 / 2) * ay * dt ** 2;
 }
 
 // Horizontal
-function horizontalAcceleration() {
+function horizontalAcceleration(): number {
     return -(K() / ENVIRONMENT.M) * vx * Math.abs(vx);
 }
 
-function horizontalVelocity(dt: number) {
+function horizontalVelocity(dt: number): number {
     return vx + ax * dt;
 }
 
-function X(dt: number) {
+function X(dt: number): number {
     return vx * dt + (1 / 2) * ax * dt ** 2;
 }
 
 // Combining
 
-function acceleration() {
+function acceleration(): number {
     return Math.sqrt(ax ** 2 + ay ** 2);
 }
 
-function velocity() {
+function velocity(): number {
     return Math.sqrt(vx ** 2 + vy ** 2);
 }
 
-function terminalVelocity() {
+function terminalVelocity(): number {
     return Math.sqrt((ENVIRONMENT.M * ENVIRONMENT.G) / K());
 }
 
+type physicsResult = {
+    v: number;
+    a: number;
+    tv: number;
+    pos: {
+        x: number;
+        y: number;
+    };
+};
+
 // Main physics
-export function physics(dt: number) {
+export function physics(dt: number): physicsResult {
     ax = horizontalAcceleration();
     ay = verticalAcceleration();
     const a = acceleration();
