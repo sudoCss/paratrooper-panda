@@ -24,6 +24,8 @@ import {
 } from "./loading";
 
 import { ENVIRONMENT, physics, setup } from "./physics";
+import { updateHabdometer } from "./habdometer";
+import { setupControlPanel, updateControlPanel } from "./controlPanel";
 
 /* DOM access */
 const canvas = document.getElementById("scene");
@@ -79,12 +81,15 @@ function handleKeypress(e) {
         } else if (!opened) {
             opened = true;
             ENVIRONMENT.A = ENVIRONMENT.A2;
+            updateControlPanel();
         }
     }
 }
 
 function init() {
     clock.start();
+
+    setupControlPanel();
 
     scene.background = skybox;
 
@@ -123,8 +128,17 @@ function update(deltaTime) {
             panda.position.setY(panda.position.y - pos.y);
         }
 
-        // LOGS
-        console.log({ v, a, tv }, "\n", panda.position);
+        updateHabdometer(
+            jumpClock.getElapsedTime(),
+            deltaTime,
+            v,
+            tv,
+            a,
+            panda.position.x,
+            panda.position.y,
+            pos.x,
+            pos.y,
+        );
     }
 }
 

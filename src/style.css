@@ -16,6 +16,20 @@ body {
     min-height: 100vh;
 }
 
+.habdometer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0.5rem 1rem;
+    backdrop-filter: blur(16px) saturate(180%);
+    background-color: rgba(17, 25, 40, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+}
+
+.habdometer p span {
+    font-weight: bolder;
+}
+
 .hidden {
     display: none !important;
 }
