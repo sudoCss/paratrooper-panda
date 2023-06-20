@@ -17,5 +17,5 @@ export function setupControlPanel() {
 }
 
 export function updateControlPanel() {
-    guiA.updateDisplay();
+    guiA?.updateDisplay();
 }
