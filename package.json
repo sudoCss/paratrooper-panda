@@ -5,9 +5,9 @@
     "author": "sudoCss",
     "type": "module",
     "scripts": {
-        "dev": "vite",
+        "dev": "vite --host",
         "build": "vite build",
-        "preview": "vite preview",
+        "preview": "vite preview --host",
         "lint": "eslint --ignore-path .gitignore .",
         "format": "prettier --write --ignore-path .gitignore ."
     },

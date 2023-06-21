@@ -6,22 +6,13 @@ import {
     DirectionalLight,
     Group,
     LinearSRGBColorSpace,
-    LoadingManager,
     PCFSoftShadowMap,
     PerspectiveCamera,
     Scene,
     WebGLRenderer,
 } from "three";
 
-import {
-    // cloud,
-    ground,
-    panda,
-    pandaAnimationMixer,
-    ship,
-    skybox,
-    startLoading,
-} from "./loading";
+import { startLoading } from "./loading";
 
 import { ENVIRONMENT, physics, setup } from "./physics";
 import { updateHabdometer } from "./habdometer";
@@ -50,6 +41,13 @@ const jumpClock = new Clock(false);
 let jumped = false;
 let opened = false;
 
+let panda,
+    ship,
+    skybox,
+    ground,
+    pandaAnimationMixer,
+    pandaAnimations = [];
+
 /* Functions */
 function handleWindowResize() {
     canvas.width = window.innerWidth;
@@ -62,27 +60,33 @@ function handleWindowResize() {
     camera.updateProjectionMatrix();
 }
 
+function changeState() {
+    if (!jumped) {
+        jumped = true;
+        jumpClock.start();
+
+        shipGroup.remove(panda);
+        panda.position.set(
+            shipGroup.position.x,
+            shipGroup.position.y,
+            shipGroup.position.z,
+        );
+        scene.add(panda);
+    } else if (!opened) {
+        opened = true;
+        ENVIRONMENT.A = ENVIRONMENT.A2;
+        updateControlPanel();
+    }
+}
+
 function handleKeypress(e) {
-    if (e.code === "KeyV") {
-        camera.position.z = camera.position.z === 5 ? 300 : 5;
+    if (e.code.startsWith("Digit")) {
+        const scaler = parseInt(e.code.slice(-1));
+        camera.position.z = scaler === 0 ? 5 : scaler * 100;
+        console.log(camera.position.z);
     }
     if (e.code === "Space") {
-        if (!jumped) {
-            jumped = true;
-            jumpClock.start();
-
-            shipGroup.remove(panda);
-            panda.position.set(
-                shipGroup.position.x,
-                shipGroup.position.y,
-                shipGroup.position.z,
-            );
-            scene.add(panda);
-        } else if (!opened) {
-            opened = true;
-            ENVIRONMENT.A = ENVIRONMENT.A2;
-            updateControlPanel();
-        }
+        changeState();
     }
 }
 
@@ -114,6 +118,7 @@ function init() {
 
     camera.position.set(0, 1, 5);
     window.addEventListener("keypress", handleKeypress);
+    window.addEventListener("dblclick", changeState);
 
     renderer.outputColorSpace = LinearSRGBColorSpace;
 }
@@ -126,21 +131,33 @@ function update(deltaTime) {
         if (panda.position.y > 1) {
             panda.position.setX(panda.position.x + pos.x);
             panda.position.setY(panda.position.y - pos.y);
+
+            updateHabdometer(
+                jumpClock.getElapsedTime(),
+                deltaTime,
+                v,
+                tv,
+                a,
+                panda.position.x,
+                panda.position.y,
+                pos.x,
+                pos.y,
+            );
         } else {
             panda.position.setY(0.6);
-        }
 
-        updateHabdometer(
-            jumpClock.getElapsedTime(),
-            deltaTime,
-            v,
-            tv,
-            a,
-            panda.position.x,
-            panda.position.y,
-            pos.x,
-            pos.y,
-        );
+            updateHabdometer(
+                jumpClock.getElapsedTime(),
+                deltaTime,
+                0,
+                0,
+                0,
+                panda.position.x,
+                0,
+                0,
+                0,
+            );
+        }
     }
 }
 
@@ -172,13 +189,21 @@ function handleValuesSubmit(e) {
     loop();
 }
 
-function handleOnLoad() {
+function handleOnLoad(loads) {
     document
         .querySelector(".loading .spinner-container")
         .classList.add("hidden");
 
     const form = document.querySelector(".loading .initials");
     form.classList.remove("hidden");
+
+    panda = loads.panda;
+    ship = loads.ship;
+    skybox = loads.skybox;
+    ground = loads.ground;
+    pandaAnimationMixer = loads.pandaAnimationMixer;
+    pandaAnimations = loads.pandaAnimations;
+    console.log(pandaAnimations);
 
     form.addEventListener("submit", handleValuesSubmit);
 }
@@ -192,9 +217,7 @@ function main() {
     window.addEventListener("resize", handleWindowResize);
     window.addEventListener("load", handleWindowResize);
 
-    const loadingManager = new LoadingManager(handleOnLoad, handleOnProgress);
-
-    startLoading(loadingManager);
+    startLoading(handleOnLoad, handleOnProgress);
 }
 
 /* Main program (function calls) */

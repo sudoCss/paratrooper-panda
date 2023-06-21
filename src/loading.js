@@ -1,6 +1,7 @@
 import {
     AnimationMixer,
     CubeTextureLoader,
+    LoadingManager,
     Mesh,
     MeshStandardMaterial,
     PlaneGeometry,
@@ -10,16 +11,23 @@ import {
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
-export let panda,
-    ship,
+const loads = {
+    panda: null,
+    ship: null,
     // cloud,
-    skybox,
-    ground,
-    pandaAnimationMixer,
-    pandaAnimations = [];
+    skybox: null,
+    ground: null,
+    pandaAnimationMixer: null,
+    pandaAnimations: [],
+};
 
-export function startLoading(loadingManager) {
+export function startLoading(handleOnLoad, handleOnProgress) {
+    const loadingManager = new LoadingManager(() => {
+        handleOnLoad(loads);
+    }, handleOnProgress);
+
     const modelLoader = new GLTFLoader(loadingManager);
+
     modelLoader.load(
         "/assets/models/Sushi Restaurant/Characters/Normal/Panda.gltf",
         (gltf) => {
@@ -29,14 +37,14 @@ export function startLoading(loadingManager) {
                     i.receiveShadow = true;
                 }
             });
-            panda = gltf.scene;
+            loads.panda = gltf.scene;
 
-            pandaAnimationMixer = new AnimationMixer(gltf.scene);
-            const action1 = pandaAnimationMixer
+            loads.pandaAnimationMixer = new AnimationMixer(gltf.scene);
+            const action1 = loads.pandaAnimationMixer
                 .clipAction(gltf.animations[9])
                 .play();
 
-            pandaAnimations.push(action1);
+            loads.pandaAnimations.push(action1);
         },
     );
 
@@ -49,7 +57,7 @@ export function startLoading(loadingManager) {
         });
         gltf.scene.scale.set(10, 10, 10);
         gltf.scene.position.set(-43, 0, 0);
-        ship = gltf.scene;
+        loads.ship = gltf.scene;
     });
 
     // modelLoader.load("/assets/models/Cloud/cloud.glb", (gltf) => {
@@ -69,13 +77,13 @@ export function startLoading(loadingManager) {
             "/assets/skyboxes/Cloudy Puresky/nz.png",
         ],
         (texture) => {
-            skybox = texture;
+            loads.skybox = texture;
         },
     );
 
     const textureLoader = new TextureLoader(loadingManager);
 
-    ground = new Mesh(
+    loads.ground = new Mesh(
         new PlaneGeometry(10000, 10000, 1000, 1000),
         new MeshStandardMaterial({
             displacementScale: 0.0001,
@@ -83,8 +91,8 @@ export function startLoading(loadingManager) {
             roughness: 0.9,
         }),
     );
-    ground.rotateOnAxis(new Vector3(1, 0, 0), -Math.PI / 2);
-    ground.receiveShadow = true;
+    loads.ground.rotateOnAxis(new Vector3(1, 0, 0), -Math.PI / 2);
+    loads.ground.receiveShadow = true;
 
     textureLoader.load(
         "/assets/textures/Grass/Grass_005_AmbientOcclusion.jpg",
@@ -92,7 +100,7 @@ export function startLoading(loadingManager) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            ground.material.aoMap = texture;
+            loads.ground.material.aoMap = texture;
         },
     );
 
@@ -102,7 +110,7 @@ export function startLoading(loadingManager) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            ground.material.map = texture;
+            loads.ground.material.map = texture;
         },
     );
 
@@ -112,7 +120,7 @@ export function startLoading(loadingManager) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            ground.material.displacementMap = texture;
+            loads.ground.material.displacementMap = texture;
         },
     );
 
@@ -122,7 +130,7 @@ export function startLoading(loadingManager) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            ground.material.normalMap = texture;
+            loads.ground.material.normalMap = texture;
         },
     );
 
@@ -132,7 +140,7 @@ export function startLoading(loadingManager) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            ground.material.roughnessMap = texture;
+            loads.ground.material.roughnessMap = texture;
         },
     );
 }
