@@ -1,4 +1,4 @@
-import { GUI } from "dat.gui";
+import { GUI } from "lil-gui";
 import { ENVIRONMENT } from "./physics";
 
 let guiA;

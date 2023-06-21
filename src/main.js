@@ -123,9 +123,11 @@ function update(deltaTime) {
     if (jumped) {
         const { v, a, tv, pos } = physics(deltaTime);
 
-        if (panda.position.y > 0) {
+        if (panda.position.y > 1) {
             panda.position.setX(panda.position.x + pos.x);
             panda.position.setY(panda.position.y - pos.y);
+        } else {
+            panda.position.setY(0.6);
         }
 
         updateHabdometer(
