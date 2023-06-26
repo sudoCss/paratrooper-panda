@@ -1,0 +1,11 @@
+Model Information:
+* title:	Arvore - Lowpoly Tree Cartoon
+* source:	https://sketchfab.com/3d-models/arvore-lowpoly-tree-cartoon-87b3e575b98743d295fb8800cc81030a
+* author:	DioMartins (https://sketchfab.com/diodesign)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Arvore - Lowpoly Tree Cartoon" (https://sketchfab.com/3d-models/arvore-lowpoly-tree-cartoon-87b3e575b98743d295fb8800cc81030a) by DioMartins (https://sketchfab.com/diodesign) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

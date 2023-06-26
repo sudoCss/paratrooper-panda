@@ -15,6 +15,8 @@ const loads = {
     panda: null,
     parachute: null,
     ship: null,
+    cloud: null,
+    tree: null,
     skybox: null,
     ground: null,
     pandaAnimationMixer: null,
@@ -49,6 +51,14 @@ export function startLoading(handleOnLoad, handleOnProgress) {
         gltf.scene.scale.set(10, 10, 10);
         gltf.scene.position.set(-11, 0, -55);
         loads.ship = gltf.scene;
+    });
+
+    modelLoader.load("/assets/models/cloud/scene.gltf", (gltf) => {
+        loads.cloud = gltf.scene;
+    });
+
+    modelLoader.load("/assets/models/tree/scene.gltf", (gltf) => {
+        loads.tree = gltf.scene;
     });
 
     /* Textures */
