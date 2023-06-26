@@ -13,8 +13,8 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 const loads = {
     panda: null,
+    parachute: null,
     ship: null,
-    // cloud,
     skybox: null,
     ground: null,
     pandaAnimationMixer: null,
@@ -28,53 +28,40 @@ export function startLoading(handleOnLoad, handleOnProgress) {
 
     const modelLoader = new GLTFLoader(loadingManager);
 
-    modelLoader.load(
-        "/assets/models/Sushi Restaurant/Characters/Normal/Panda.gltf",
-        (gltf) => {
-            gltf.scene.traverse((i) => {
-                if (i.isObject3D) {
-                    i.castShadow = true;
-                    i.receiveShadow = true;
-                }
-            });
-            loads.panda = gltf.scene;
+    modelLoader.load("/assets/models/panda/Panda.gltf", (gltf) => {
+        loads.panda = gltf.scene;
 
-            loads.pandaAnimationMixer = new AnimationMixer(gltf.scene);
-            const action1 = loads.pandaAnimationMixer
-                .clipAction(gltf.animations[9])
-                .play();
+        loads.pandaAnimationMixer = new AnimationMixer(gltf.scene);
+        const action1 = loads.pandaAnimationMixer
+            .clipAction(gltf.animations[9])
+            .play();
 
-            loads.pandaAnimations.push(action1);
-        },
-    );
-
-    modelLoader.load("/assets/models/Pirate/ship_dark.gltf", (gltf) => {
-        gltf.scene.traverse((i) => {
-            if (i.isObject3D) {
-                i.castShadow = true;
-                i.receiveShadow = true;
-            }
-        });
-        gltf.scene.scale.set(10, 10, 10);
-        gltf.scene.position.set(-43, 0, 0);
-        loads.ship = gltf.scene;
+        loads.pandaAnimations.push(action1);
     });
 
-    // modelLoader.load("/assets/models/Cloud/cloud.glb", (gltf) => {
-    //     cloud = gltf.scene;
-    // });
+    modelLoader.load("/assets/models/parachute/scene.gltf", (gltf) => {
+        gltf.scene.position.set(0, -0.3, -1);
+        loads.parachute = gltf.scene;
+    });
+
+    modelLoader.load("/assets/models/ship/ship_dark.gltf", (gltf) => {
+        gltf.scene.rotateOnAxis(new Vector3(0, 1, 0), -Math.PI / 2);
+        gltf.scene.scale.set(10, 10, 10);
+        gltf.scene.position.set(-11, 0, -55);
+        loads.ship = gltf.scene;
+    });
 
     /* Textures */
     const cubeTextureLoader = new CubeTextureLoader(loadingManager);
 
     cubeTextureLoader.load(
         [
-            "/assets/skyboxes/Cloudy Puresky/px.png",
-            "/assets/skyboxes/Cloudy Puresky/nx.png",
-            "/assets/skyboxes/Cloudy Puresky/py.png",
-            "/assets/skyboxes/Cloudy Puresky/ny.png",
-            "/assets/skyboxes/Cloudy Puresky/pz.png",
-            "/assets/skyboxes/Cloudy Puresky/nz.png",
+            "/assets/skybox/px.png",
+            "/assets/skybox/nx.png",
+            "/assets/skybox/py.png",
+            "/assets/skybox/ny.png",
+            "/assets/skybox/pz.png",
+            "/assets/skybox/nz.png",
         ],
         (texture) => {
             loads.skybox = texture;
@@ -92,7 +79,6 @@ export function startLoading(handleOnLoad, handleOnProgress) {
         }),
     );
     loads.ground.rotateOnAxis(new Vector3(1, 0, 0), -Math.PI / 2);
-    loads.ground.receiveShadow = true;
 
     textureLoader.load(
         "/assets/textures/Grass/Grass_005_AmbientOcclusion.jpg",

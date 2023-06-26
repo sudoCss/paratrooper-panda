@@ -6,7 +6,6 @@ import {
     DirectionalLight,
     Group,
     LinearSRGBColorSpace,
-    PCFSoftShadowMap,
     PerspectiveCamera,
     Scene,
     WebGLRenderer,
@@ -33,8 +32,6 @@ const renderer = new WebGLRenderer({
     canvas,
     antialias: true,
 });
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = PCFSoftShadowMap;
 const shipGroup = new Group();
 const clock = new Clock(false);
 const jumpClock = new Clock(false);
@@ -42,6 +39,7 @@ let jumped = false;
 let opened = false;
 
 let panda,
+    parachute,
     ship,
     skybox,
     ground,
@@ -74,6 +72,7 @@ function changeState() {
         scene.add(panda);
     } else if (!opened) {
         opened = true;
+        panda.add(parachute);
         ENVIRONMENT.A = ENVIRONMENT.A2;
         updateControlPanel();
     }
@@ -82,8 +81,7 @@ function changeState() {
 function handleKeypress(e) {
     if (e.code.startsWith("Digit")) {
         const scaler = parseInt(e.code.slice(-1));
-        camera.position.z = scaler === 0 ? 5 : scaler * 100;
-        console.log(camera.position.z);
+        camera.position.z = scaler === 0 ? 5 : scaler * 50;
     }
     if (e.code === "Space") {
         changeState();
@@ -93,7 +91,12 @@ function handleKeypress(e) {
 function init() {
     clock.start();
 
-    setupControlPanel();
+    setupControlPanel(({ controllers: { A } }) => {
+        if (opened) {
+            const scaler = A / 20;
+            parachute.scale.set(scaler, scaler, scaler);
+        }
+    });
 
     scene.background = skybox;
 
@@ -111,20 +114,21 @@ function init() {
     /* Lighting */
     const ambientLight = new AmbientLight(0xffffff, 1);
     const directionalLight = new DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(-1000, 1000, 10);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.camera.far = 3000;
+    directionalLight.position.set(0, 10000, 10);
     scene.add(ambientLight, directionalLight);
 
     camera.position.set(0, 1, 5);
-    window.addEventListener("keypress", handleKeypress);
-    window.addEventListener("dblclick", changeState);
+    setTimeout(() => {
+        window.addEventListener("keypress", handleKeypress);
+        window.addEventListener("dblclick", changeState);
+    }, 1000);
 
     renderer.outputColorSpace = LinearSRGBColorSpace;
 }
 
 function update(deltaTime) {
     pandaAnimationMixer.update(deltaTime);
+    shipGroup.position.x += deltaTime * ENVIRONMENT.V0x;
     if (jumped) {
         const { v, a, tv, pos } = physics(deltaTime);
 
@@ -157,7 +161,11 @@ function update(deltaTime) {
                 0,
                 0,
             );
+            // TODO: Make the parachute fall back instead
+            panda.remove(parachute)
         }
+    } else {
+        ground.position.x = shipGroup.position.x;
     }
 }
 
@@ -174,7 +182,6 @@ function loop() {
 
 function handleValuesSubmit(e) {
     e.preventDefault();
-    /** Get Inputs and change variables if needed */
     const data = new FormData(e.target);
     const fields = Object.fromEntries(data.entries());
 
@@ -182,7 +189,6 @@ function handleValuesSubmit(e) {
     ENVIRONMENT.H = +fields.shipHeight;
     setup();
 
-    /** Get Inputs */
     document.querySelector(".loading").remove();
 
     init();
@@ -198,6 +204,7 @@ function handleOnLoad(loads) {
     form.classList.remove("hidden");
 
     panda = loads.panda;
+    parachute = loads.parachute;
     ship = loads.ship;
     skybox = loads.skybox;
     ground = loads.ground;
