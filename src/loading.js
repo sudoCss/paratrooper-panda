@@ -1,6 +1,7 @@
 import {
     AnimationMixer,
     CubeTextureLoader,
+    Group,
     LoadingManager,
     Mesh,
     MeshStandardMaterial,
@@ -15,10 +16,10 @@ const loads = {
     panda: null,
     parachute: null,
     ship: null,
-    cloud: null,
+    cloud: new Group(),
     tree: null,
     skybox: null,
-    ground: null,
+    ground: new Group(),
     pandaAnimationMixer: null,
     pandaAnimations: [],
 };
@@ -54,11 +55,32 @@ export function startLoading(handleOnLoad, handleOnProgress) {
     });
 
     modelLoader.load("/assets/models/cloud/scene.gltf", (gltf) => {
-        loads.cloud = gltf.scene;
+        const cloud = gltf.scene;
+
+        for (let i = 0; i <= 500; i++) {
+            const x = (Math.random() - 0.5) * 10000,
+                y = Math.random() * 10000 + 200,
+                z = (Math.random() - 0.5) * 10000;
+            const scaler = Math.random() * 20;
+            const clonedCloud = cloud.clone();
+            clonedCloud.position.set(x, y, z);
+            clonedCloud.scale.set(scaler, scaler, scaler);
+            loads.cloud.add(clonedCloud);
+        }
+        loads.ground.add(loads.cloud);
     });
 
     modelLoader.load("/assets/models/tree/scene.gltf", (gltf) => {
         loads.tree = gltf.scene;
+
+        for (let i = 0; i <= 1000; i++) {
+            const x = (Math.random() - 0.5) * 10000,
+                y = 0,
+                z = (Math.random() - 0.5) * 1000;
+            const clonedTree = loads.tree.clone();
+            clonedTree.position.set(x, y, z);
+            loads.ground.add(clonedTree);
+        }
     });
 
     /* Textures */
@@ -80,7 +102,7 @@ export function startLoading(handleOnLoad, handleOnProgress) {
 
     const textureLoader = new TextureLoader(loadingManager);
 
-    loads.ground = new Mesh(
+    const ground = new Mesh(
         new PlaneGeometry(10000, 10000, 1000, 1000),
         new MeshStandardMaterial({
             displacementScale: 0.0001,
@@ -88,7 +110,7 @@ export function startLoading(handleOnLoad, handleOnProgress) {
             roughness: 0.9,
         }),
     );
-    loads.ground.rotateOnAxis(new Vector3(1, 0, 0), -Math.PI / 2);
+    ground.rotateOnAxis(new Vector3(1, 0, 0), -Math.PI / 2);
 
     textureLoader.load(
         "/assets/textures/Grass/Grass_005_AmbientOcclusion.jpg",
@@ -96,7 +118,7 @@ export function startLoading(handleOnLoad, handleOnProgress) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            loads.ground.material.aoMap = texture;
+            ground.material.aoMap = texture;
         },
     );
 
@@ -106,7 +128,7 @@ export function startLoading(handleOnLoad, handleOnProgress) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            loads.ground.material.map = texture;
+            ground.material.map = texture;
         },
     );
 
@@ -116,7 +138,7 @@ export function startLoading(handleOnLoad, handleOnProgress) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            loads.ground.material.displacementMap = texture;
+            ground.material.displacementMap = texture;
         },
     );
 
@@ -126,7 +148,7 @@ export function startLoading(handleOnLoad, handleOnProgress) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            loads.ground.material.normalMap = texture;
+            ground.material.normalMap = texture;
         },
     );
 
@@ -136,7 +158,9 @@ export function startLoading(handleOnLoad, handleOnProgress) {
             texture.wrapS = RepeatWrapping;
             texture.wrapT = RepeatWrapping;
             texture.repeat.set(1000, 1000);
-            loads.ground.material.roughnessMap = texture;
+            ground.material.roughnessMap = texture;
         },
     );
+
+    loads.ground.add(ground);
 }

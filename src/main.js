@@ -27,7 +27,7 @@ const camera = new PerspectiveCamera(
     75,
     canvas.width / canvas.height,
     0.1,
-    100_000,
+    10000,
 );
 const renderer = new WebGLRenderer({
     canvas,
@@ -43,13 +43,10 @@ let panda,
     parachute,
     ship,
     cloud,
-    tree,
     skybox,
     ground,
     pandaAnimationMixer,
     pandaAnimations = [];
-let clouds = [],
-    trees = [];
 
 /** @type {Stats} */
 let stats;
@@ -64,22 +61,6 @@ function handleWindowResize() {
 
     camera.aspect = canvas.width / canvas.height;
     camera.updateProjectionMatrix();
-}
-
-function placeModelClone(
-    model,
-    group = scene,
-    x = 0,
-    y = 0,
-    z = 0,
-    scaler = 1,
-) {
-    const clone = model?.clone();
-    if (clone === undefined) return;
-    clone.position.set(x, y, z);
-    clone.scale.set(scaler, scaler, scaler);
-    group.add(clone);
-    return clone;
 }
 
 function changeState() {
@@ -105,7 +86,7 @@ function changeState() {
 function handleKeypress(e) {
     if (e.code.startsWith("Digit")) {
         const scaler = parseInt(e.code.slice(-1));
-        camera.position.z = scaler === 0 ? 5 : scaler * 50;
+        camera.position.z = scaler === 0 ? 5 : scaler * 10;
     }
     if (e.code === "Space") {
         changeState();
@@ -152,44 +133,13 @@ function init() {
     }, 1000);
 
     renderer.outputColorSpace = LinearSRGBColorSpace;
-
-    setInterval(() => {
-        if(jumped && panda.position.y < 200) return;
-        let x, y;
-        if (!jumped) {
-            x = shipGroup.position.x + (Math.random() - 0.5) * 1000;
-            y = Math.random() * (shipGroup.position.y + 200);
-        } else {
-            x = panda.position.x + (Math.random() - 0.5) * 1000;
-            y = Math.random() * (panda.position.y + 200);
-        }
-        if (clouds.length <= 200) {
-            clouds.push(
-                placeModelClone(
-                    cloud,
-                    scene,
-                    x,
-                    y,
-                    (Math.random() - 0.5) * 100,
-                    (Math.random() - 0.5) * 30,
-                ),
-            );
-        } else {
-            const cloudsToDelete = clouds.slice(0, 50);
-            clouds = clouds.slice(50, clouds.length);
-            for (let i = 0; i < cloudsToDelete.length; i++) {
-                scene.remove(cloudsToDelete[i]);
-            }
-        }
-    }, 200);
 }
 
 function update(deltaTime) {
     pandaAnimationMixer.update(deltaTime);
-    shipGroup.position.x += deltaTime * ENVIRONMENT.V0x;
 
-    console.log(clouds.length);
     if (jumped) {
+        shipGroup.position.x += deltaTime * ENVIRONMENT.V0x;
         const { v, a, tv, pos } = physics(deltaTime);
 
         if (panda.position.y > 1) {
@@ -225,7 +175,7 @@ function update(deltaTime) {
             panda.remove(parachute);
         }
     } else {
-        ground.position.x = shipGroup.position.x;
+        cloud.rotateY(clock.getElapsedTime() * 0.0001);
     }
 }
 
@@ -269,7 +219,6 @@ function handleOnLoad(loads) {
     parachute = loads.parachute;
     ship = loads.ship;
     cloud = loads.cloud;
-    tree = loads.tree;
     skybox = loads.skybox;
     ground = loads.ground;
     pandaAnimationMixer = loads.pandaAnimationMixer;
