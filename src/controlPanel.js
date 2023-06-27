@@ -11,7 +11,7 @@ export function setupControlPanel(handleOnChange) {
     gui.add(ENVIRONMENT, "Cd", 0.8, 1.2, 0.001);
     gui.add(ENVIRONMENT, "Ro", 0, 10, 0.001);
 
-    guiA = gui.add(ENVIRONMENT, "A", 0.1, 200, 0.1).onChange(()=>{
+    guiA = gui.add(ENVIRONMENT, "A", 0.1, 200, 0.1).onChange(() => {
         const values = gui.save();
         handleOnChange(values);
     });

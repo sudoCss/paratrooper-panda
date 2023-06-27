@@ -38,7 +38,8 @@ const clock = new Clock(false);
 const jumpClock = new Clock(false);
 
 let jumped = false,
-    opened = false;
+    opened = false,
+    landed = false;
 let panda,
     parachute,
     ship,
@@ -46,7 +47,7 @@ let panda,
     skybox,
     ground,
     pandaAnimationMixer,
-    pandaAnimations = [];
+    pandaAnimations;
 
 /** @type {Stats} */
 let stats;
@@ -72,9 +73,23 @@ function changeState() {
         panda.position.set(
             shipGroup.position.x,
             shipGroup.position.y,
-            shipGroup.position.z,
+            shipGroup.position.z + 3,
         );
         scene.add(panda);
+
+        pandaAnimationMixer.stopAllAction();
+        pandaAnimations.jump.play();
+        pandaAnimationMixer.addEventListener(
+            "finished",
+            function eventListener() {
+                pandaAnimationMixer.stopAllAction();
+                pandaAnimations.jumpIdle.play();
+                pandaAnimationMixer.removeEventListener(
+                    "finished",
+                    eventListener,
+                );
+            },
+        );
     } else if (!opened) {
         opened = true;
         panda.add(parachute);
@@ -86,7 +101,7 @@ function changeState() {
 function handleKeypress(e) {
     if (e.code.startsWith("Digit")) {
         const scaler = parseInt(e.code.slice(-1));
-        camera.position.z = scaler === 0 ? 5 : scaler * 10;
+        camera.position.z = scaler === 0 ? 5 : scaler * 15;
     }
     if (e.code === "Space") {
         changeState();
@@ -126,11 +141,12 @@ function init() {
     directionalLight.position.set(0, 10000, 10);
     scene.add(ambientLight, directionalLight);
 
-    camera.position.set(0, 1, 5);
+    camera.position.set(0, 2, 5);
+
     setTimeout(() => {
         window.addEventListener("keypress", handleKeypress);
         window.addEventListener("dblclick", changeState);
-    }, 1000);
+    }, 200);
 
     renderer.outputColorSpace = LinearSRGBColorSpace;
 }
@@ -158,6 +174,17 @@ function update(deltaTime) {
                 pos.y,
             );
         } else {
+            if (!landed) {
+                pandaAnimationMixer.stopAllAction();
+                if (v > 10) {
+                    pandaAnimations.death.play();
+                } else {
+                    pandaAnimations.idle.play();
+                }
+            }
+
+            landed = true;
+
             panda.position.setY(0.6);
 
             updateHabdometer(
@@ -223,7 +250,6 @@ function handleOnLoad(loads) {
     ground = loads.ground;
     pandaAnimationMixer = loads.pandaAnimationMixer;
     pandaAnimations = loads.pandaAnimations;
-    console.log(pandaAnimations);
 
     form.addEventListener("submit", handleValuesSubmit);
 }

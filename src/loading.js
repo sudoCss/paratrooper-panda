@@ -3,6 +3,7 @@ import {
     CubeTextureLoader,
     Group,
     LoadingManager,
+    LoopOnce,
     Mesh,
     MeshStandardMaterial,
     PlaneGeometry,
@@ -21,7 +22,7 @@ const loads = {
     skybox: null,
     ground: new Group(),
     pandaAnimationMixer: null,
-    pandaAnimations: [],
+    pandaAnimations: {},
 };
 
 export function startLoading(handleOnLoad, handleOnProgress) {
@@ -35,11 +36,29 @@ export function startLoading(handleOnLoad, handleOnProgress) {
         loads.panda = gltf.scene;
 
         loads.pandaAnimationMixer = new AnimationMixer(gltf.scene);
-        const action1 = loads.pandaAnimationMixer
-            .clipAction(gltf.animations[9])
-            .play();
 
-        loads.pandaAnimations.push(action1);
+        loads.pandaAnimations.death = loads.pandaAnimationMixer.clipAction(
+            gltf.animations[6],
+        );
+        loads.pandaAnimations.death.setLoop(LoopOnce);
+        loads.pandaAnimations.death.clampWhenFinished = true;
+
+        loads.pandaAnimations.idle = loads.pandaAnimationMixer.clipAction(
+            gltf.animations[9],
+        );
+
+        loads.pandaAnimations.jump = loads.pandaAnimationMixer.clipAction(
+            gltf.animations[11],
+        );
+        loads.pandaAnimations.jump.setLoop(LoopOnce);
+        loads.pandaAnimations.jump.clampWhenFinished = true;
+
+        loads.pandaAnimations.jumpIdle = loads.pandaAnimationMixer.clipAction(
+            gltf.animations[12],
+        );
+        loads.pandaAnimations.jumpIdle.clampWhenFinished = true;
+
+        loads.pandaAnimations.idle.play();
     });
 
     modelLoader.load("/assets/models/parachute/scene.gltf", (gltf) => {
@@ -76,7 +95,7 @@ export function startLoading(handleOnLoad, handleOnProgress) {
         for (let i = 0; i <= 1000; i++) {
             const x = (Math.random() - 0.5) * 10000,
                 y = 0,
-                z = (Math.random() - 0.5) * 1000;
+                z = (Math.random() - 0.5) * 2000;
             const clonedTree = loads.tree.clone();
             clonedTree.position.set(x, y, z);
             loads.ground.add(clonedTree);
